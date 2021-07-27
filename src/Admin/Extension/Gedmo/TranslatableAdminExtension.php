@@ -76,17 +76,19 @@ class TranslatableAdminExtension extends AbstractTranslatableAdminExtension
     public function alterObject(AdminInterface $admin, $object)
     {
         if ($this->getTranslatableChecker()->isTranslatable($object)) {
-            $translatableListener = $this->getTranslatableListener($admin);
-            $translatableListener->setTranslatableLocale($this->getTranslatableLocale($admin));
-            $translatableListener->setTranslationFallback(false);
+            if ($object->getLocale() !== $this->getTranslatableLocale($admin)) {
+                $translatableListener = $this->getTranslatableListener($admin);
+                $translatableListener->setTranslatableLocale($this->getTranslatableLocale($admin));
+                $translatableListener->setTranslationFallback(false);
 
-            // NEXT_MAJOR: Use $this->managerRegistry directly.
-            $objectManager = $this->getManagerRegistry($admin)->getManagerForClass(\get_class($object));
+                // NEXT_MAJOR: Use $this->managerRegistry directly.
+                $objectManager = $this->getManagerRegistry($admin)->getManagerForClass(\get_class($object));
 
-            \assert($objectManager instanceof ObjectManager);
+                \assert($objectManager instanceof ObjectManager);
 
-            $objectManager->refresh($object);
-            $object->setLocale($this->getTranslatableLocale($admin));
+                $objectManager->refresh($object);
+                $object->setLocale($this->getTranslatableLocale($admin));
+            }
         }
     }
 
